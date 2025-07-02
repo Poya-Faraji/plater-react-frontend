@@ -1,11 +1,15 @@
-
+import Dashboard from "./assets/components/dashboard/userDashboard";
+import Login from "./assets/components/Login/login";
 
 function App() {
-  return (
-    <>
-      <h1 className="text-red-500">Test</h1>
-    </>
-  );
+  const isAuth = false;
+  // const token = localStorage.getItem("token");
+
+  if (isAuth) {
+    return <Dashboard />;
+  }
+
+  return <Login />;
 }
 
 export default App;
