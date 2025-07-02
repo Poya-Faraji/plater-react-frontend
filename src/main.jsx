@@ -6,9 +6,13 @@ import { ThemeProvider } from "@material-tailwind/react";
 import NotFoundPage from "./assets/components/NotFoundPage/notFound.jsx";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import SignUp from "./assets/components/SignUp/signup.jsx";
+import Login from "./assets/components/Login/login.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
+  { path: "/login", element: <Login /> },
+  { path: "/signup", element: <SignUp /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
 
