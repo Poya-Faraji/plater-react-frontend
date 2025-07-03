@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { verifyToken } from "../../services/auth";
+import { verifyToken } from "../../services/verifyToken";
 import { useNavigate } from "react-router-dom";
-
+import { getUserInfo } from "../../services/getUserInfo";
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -12,15 +12,32 @@ export default function Dashboard() {
       if (!isAuthenticated) {
         navigate("/login", { replace: true });
       }
-      setIsLoading(false);
     };
-
+    getUserInfo().then((data) => setUserData(data));
     checkAuth();
   }, [navigate]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (userData.userType === "OWNER") {
+    return (
+      <div>
+        <h1>Welcome to dashboard OWNER</h1>
+        <p>Username: {userData.username}</p>
+        <p>First Name: {userData.fname}</p>
+        <p>Last Name: {userData.lname}</p>
+        <p>National Code: {userData.codeMeli}</p>
+        <p>Usertype: {userData.userType}</p>
+      </div>
+    );
   }
 
-  return <div>Welcome to user Dashboard</div>;
+  return (
+    <div>
+      <h1>OFFICER</h1>
+      <p>Username: {userData.username}</p>
+      <p>First Name: {userData.fname}</p>
+      <p>Last Name: {userData.lname}</p>
+      <p>National Code: {userData.codeMeli}</p>
+      <p>Usertype: {userData.userType}</p>
+    </div>
+  );
 }

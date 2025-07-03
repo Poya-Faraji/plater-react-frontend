@@ -19,11 +19,9 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterProvider router={router}>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
-    </RouterProvider>
-  </StrictMode>
+  <RouterProvider router={router}>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </RouterProvider>
 );
