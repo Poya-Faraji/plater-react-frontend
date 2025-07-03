@@ -1,7 +1,7 @@
 import "./notFound.css"
 export default function NotFoundPage() {
   return (
-    <div>
+    <div className="notFound">
       <svg
         id="svgWrap_2"
         xmlns="http://www.w3.org/2000/svg"
