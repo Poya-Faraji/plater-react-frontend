@@ -1,16 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Input,
   Button,
   Typography,
   Card,
   CardBody,
-  Select,
-  Option,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
-
-
 
 const LOGIN_API_URL = import.meta.env.VITE_LOGIN_API_ENDPOINT;
 
@@ -20,12 +16,9 @@ const Login = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-
-    postalCode: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginSuccess, setloginSuccess] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -47,6 +40,7 @@ const Login = () => {
       const response = await loginUser(formData);
 
       localStorage.setItem("token", response.token);
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -82,7 +76,6 @@ const Login = () => {
       const responseData = await response.json();
 
       if (responseData) {
-        setloginSuccess(true);
         return responseData;
       }
     } catch (error) {
@@ -90,9 +83,12 @@ const Login = () => {
     }
   };
 
-  if (loginSuccess) {
-     navigate('/dashboard')
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
