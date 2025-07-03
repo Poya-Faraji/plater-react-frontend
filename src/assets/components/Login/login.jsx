@@ -1,92 +1,151 @@
 import { useState } from "react";
+import {
+  Input,
+  Button,
+  Typography,
+  Card,
+  CardBody,
+  Select,
+  Option,
+} from "@material-tailwind/react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Typography, Input, Button } from "@material-tailwind/react";
-import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
 
-export function Login() {
-  const [passwordShown, setPasswordShown] = useState(false);
-  const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
+
+const LOGIN_API_URL = import.meta.env.VITE_LOGIN_API_ENDPOINT;
+
+const Login = () => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+
+    postalCode: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginSuccess, setloginSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      // Calling API function
+      const response = await loginUser(formData);
+
+      localStorage.setItem("token", response.token);
+    } catch (err) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // user register API function
+  const loginUser = async (data) => {
+    // Validate required fields
+    if (!data.username || !data.password) {
+      throw new Error("Username and Password are both required");
+    }
+
+    if (data.password.length < 6) {
+      throw new Error("Password must be at least 6 characters long");
+    }
+
+    try {
+      const response = await fetch(LOGIN_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Login failed!");
+      }
+
+      const responseData = await response.json();
+
+      if (responseData) {
+        setloginSuccess(true);
+        return responseData;
+      }
+    } catch (error) {
+      return { msg: error.message };
+    }
+  };
+
+  if (loginSuccess) {
+     navigate('/dashboard')
+  }
 
   return (
-    <section className="grid text-center h-screen items-center p-8">
-      <div>
-        <Typography variant="h2" color="blue-gray" className="mb-2">
-          Login
-        </Typography>
-        <Typography className="mb-4 text-gray-600 font-normal text-[18px]">
-          Enter your email and password to Login
-        </Typography>
-        <form action="#" className="mx-auto max-w-[24rem] text-left">
-          <div className="mb-6">
-            <label htmlFor="email">
-              <Typography
-                variant="small"
-                className="mb-2 block font-medium text-gray-900"
-              >
-                Your Email
-              </Typography>
-            </label>
-            <Input
-              id="email"
-              color="gray"
-              size="lg"
-              type="email"
-              name="email"
-              placeholder="name@mail.com"
-              className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200"
-              labelProps={{
-                className: "hidden",
-              }}
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="password">
-              <Typography
-                variant="small"
-                className="mb-2 block font-medium text-gray-900"
-              >
-                Password
-              </Typography>
-            </label>
-            <Input
-              size="lg"
-              placeholder="********"
-              labelProps={{
-                className: "hidden",
-              }}
-              className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200"
-              type={passwordShown ? "text" : "password"}
-              icon={
-                <i onClick={togglePasswordVisiblity}>
-                  {passwordShown ? (
-                    <EyeIcon className="h-5 w-5" />
-                  ) : (
-                    <EyeSlashIcon className="h-5 w-5" />
-                  )}
-                </i>
-              }
-            />
-          </div>
-          <Button color="gray" size="lg" className="mt-6" fullWidth>
-            Login
-          </Button>
-   
-
-          <Typography
-            variant="small"
-            color="gray"
-            className="!mt-4 text-center font-normal"
-          >
-            Not registered?{" "}
-            <Link to={"/signup"} className="font-medium text-gray-900">
-              Create account
-            </Link>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-md">
+        <CardBody className="flex flex-col gap-3">
+          <Typography variant="h5" color="blue-gray">
+            Login to account
           </Typography>
-        </form>
-      </div>
-    </section>
+          <p>Enter your username and password to login</p>
+          {error && (
+            <Typography color="red" className="text-sm">
+              {error}
+            </Typography>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+            <Input
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+
+            <Input
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              disabled={isSubmitting}
+              className="mt-6"
+            >
+              {isSubmitting ? "Loging in..." : "Login"}
+            </Button>
+          </form>
+
+          <div>
+            <Link to={"/signup"}>
+              Don't have an account?
+              <p className="text-blue-500 inline"> Create an account</p>
+            </Link>
+          </div>
+        </CardBody>
+      </Card>
+    </div>
   );
-}
+};
 
 export default Login;

@@ -8,11 +8,13 @@ import NotFoundPage from "./assets/components/NotFoundPage/notFound.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignUp from "./assets/components/SignUp/signup.jsx";
 import Login from "./assets/components/Login/login.jsx";
+import Dashboard from "./assets/components/dashboard/userDashboard.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <SignUp /> },
+  { path: "/dashboard", element: <Dashboard /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
 
