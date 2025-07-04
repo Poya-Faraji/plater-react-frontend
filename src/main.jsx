@@ -9,12 +9,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignUp from "./assets/components/SignUp/signup.jsx";
 import Login from "./assets/components/Login/login.jsx";
 import Dashboard from "./assets/components/dashboard/userDashboard.jsx";
+import AddVehicle from "./assets/components/AddVehicle/addVehicle.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <SignUp /> },
   { path: "/dashboard", element: <Dashboard /> },
+  { path: "/dashboard/add-vehicle", element: <AddVehicle /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
 
