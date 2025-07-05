@@ -15,9 +15,6 @@ const REGISTER_API_URL = import.meta.env.VITE_REGISTER_API_ENDPOINT
 
 const SignUp = () => {
 
-
-
-  
   const [formData, setFormData] = useState({
     username: "",
     password: "",

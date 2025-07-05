@@ -1,28 +1,24 @@
 import { useNavigate } from "react-router-dom";
 
-const Vehicles = ({ vehicles , ownerID}) => {
-  
-  const navigate = useNavigate()
-  
+const Vehicles = ({ vehicles, ownerID }) => {
+  const navigate = useNavigate();
   // Handle empty state
   if (!vehicles || vehicles.length === 0) {
-    navigate('/dashboard/add-vehicle')
+    return navigate("/add-vehicle", { replace: true });
   }
 
-
-  const ViewVehicleDetail = ({id}) => { 
-    
+  const ViewVehicleDetail = ({ id }) => {
     console.log("vehicle Id:", id);
-     console.log("Owner ID:", ownerID);
-  }
-  
+    console.log("Owner ID:", ownerID);
+  };
 
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold mb-4">Your Vehicles</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {vehicles.map((vehicle) => (
-          <div onClick={()=> ViewVehicleDetail(vehicle)}
+          <div
+            onClick={() => ViewVehicleDetail(vehicle)}
             key={`${vehicle.first2digits}-${vehicle.letter}-${vehicle.last3digits}-${vehicle.citycode}`}
             className="border rounded-lg p-4 hover:shadow-md transition-shadow"
           >

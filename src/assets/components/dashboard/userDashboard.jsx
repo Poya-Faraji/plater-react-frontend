@@ -29,7 +29,7 @@ export default function Dashboard() {
     if (!userData.vehicles || userData.vehicles.length === 0) {
       return (
         <div>
-          <Link to={"/dashboard/add-vehicle"}>
+          <Link onClick={()=> localStorage.setItem("ownerID", userData.id)} to={"/dashboard/add-vehicle"}>
             <Button>Add Vehicle</Button>
           </Link>
 
@@ -59,7 +59,7 @@ export default function Dashboard() {
           <Link onClick={logoutHandler} to={"/login"}>
             <Button className="bg-red-600">Logout</Button>
           </Link>
-          <Link to={"/dashboard/add-vehicle"}>
+          <Link onClick={()=> localStorage.setItem("ownerID", userData.id)} to={"/dashboard/add-vehicle"}>
             <Button>Add Vehicle</Button>
           </Link>
         </div>
