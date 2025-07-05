@@ -15,7 +15,6 @@ import {verifyToken} from "../../services/verifyToken"
 const VEHICLE_API_URL = import.meta.env.VITE_CREATE_VEHICLE_API_ENDPOINT;
 const PLATE_API_URL = import.meta.env.VITE_PLATE_API_URL;
 
-const OWNER_ID = localStorage.getItem("ownerID");
 
 const SELECT_LETTERS = [
   "ب",
@@ -56,13 +55,20 @@ const ENGLISH_TO_PERSIAN = {
 };
 
 const AddVehicle = () => {
+
+  const OWNER_ID = localStorage.getItem("ownerID");
   const navigate = useNavigate();
 
   useEffect(() => {
+     
+     
     const checkAuth = async () => {
       const isAuthenticated = await verifyToken();
       if (!isAuthenticated) {
         navigate("/login", { replace: true });
+      }
+      if(!OWNER_ID) {
+        navigate('/dashboard', {replace: true})
       }
     };
 
@@ -102,8 +108,6 @@ const AddVehicle = () => {
   const handleScanButton = () => {
     setIsManual(false);
     setIsScan(true);
-    setScanResult(null);
-    setSelectedImage(null);
   };
 
   const handleChange = (e) => {
