@@ -11,6 +11,7 @@ import {
 } from "@material-tailwind/react";
 
 const VEHICLE_API_URL = import.meta.env.VITE_CREATE_VEHICLE_API_ENDPOINT;
+const PLATE_API_URL = import.meta.env.VITE_PLATE_API_URL;
 
 const OWNER_ID = localStorage.getItem("ownerID");
 
@@ -33,6 +34,25 @@ const SELECT_LETTERS = [
   "ز",
 ];
 
+const ENGLISH_TO_PERSIAN = {
+  be: "ب",
+  dal: "د",
+  ein: "ع",
+  he: "ح",
+  jim: "ج",
+  lam: "ل",
+  mim: "م",
+  nun: "ن",
+  qaf: "ق",
+  sad: "ص",
+  sin: "س",
+  ta: "ط",
+  te: "ت",
+  vav: "و",
+  ye: "ی",
+  zhe: "ز",
+};
+
 const AddVehicle = () => {
   const navigate = useNavigate();
 
@@ -53,23 +73,100 @@ const AddVehicle = () => {
   const [isManual, setIsManual] = useState(false);
   const [isScan, setIsScan] = useState(false);
 
+  // Plate scanning states
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [scanResult, setScanResult] = useState(null);
+
   const handleManualButton = () => {
     setIsManual(true);
     setIsScan(false);
+    setScanResult(null);
+    setSelectedImage(null);
   };
 
   const handleScanButton = () => {
     setIsManual(false);
     setIsScan(true);
+    setScanResult(null);
+    setSelectedImage(null);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedImage(file);
+      processPlateImage(file);
+    }
+  };
+
+  const processPlateImage = async (file) => {
+    setIsProcessing(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(PLATE_API_URL, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const mutliplePlateError = await response.json().then((data) => {
+          return data.detail;
+        });
+        if (mutliplePlateError) {
+          throw new Error(mutliplePlateError);
+        }
+
+        throw new Error("Failed to detect plate");
+      }
+
+      const result = await response.json();
+
+      if (
+        !result.first2digits ||
+        !result.letter ||
+        !result.last3digits ||
+        !result.citycode
+      ) {
+        throw new Error(
+          "Plate format is incorrect. Please provide correct plate format."
+        );
+      }
+
+      // Convert English letter to Persian
+      const persianLetter = ENGLISH_TO_PERSIAN[result.letter] || result.letter;
+
+      // Update form data with detected values
+      setFormData((prev) => ({
+        ...prev,
+        first2digits: result.first2digits,
+        letter: persianLetter,
+        last3digits: result.last3digits,
+        citycode: result.citycode,
+      }));
+
+      // Store result for display
+      setScanResult({
+        ...result,
+        letter: persianLetter,
+      });
+    } catch (err) {
+      setError("Plate detection error: " + err.message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const createVehicle = async (data) => {
@@ -85,26 +182,24 @@ const AddVehicle = () => {
       throw new Error("All fields are required");
     }
 
-
-
-    // Validate form data
     if (data.first2digits.length !== 2 || !/^\d+$/.test(data.first2digits)) {
-  
       throw new Error("First 2 digits must be 2 digits");
     }
 
     if (data.letter.length !== 1 || /^\d+$/.test(data.letter)) {
-      throw new Error("Plate lettermust be 1 character");
+      throw new Error("Plate letter must be 1 character");
     }
+
     if (data.last3digits.length !== 3 || !/^\d+$/.test(data.last3digits)) {
-      throw new Error("Last 3 digits must be 3 digits ");
+      throw new Error("Last 3 digits must be 3 digits");
     }
+
     if (data.citycode.length !== 2 || !/^\d+$/.test(data.citycode)) {
       throw new Error("City code must be 2 digits");
     }
 
     if (/^\d+$/.test(data.model) || /^\d+$/.test(data.color)) {
-      throw new Error("Model and Color must be a word");
+      throw new Error("Model and Color must be words");
     }
 
     if (data.year.length !== 4 || !/^\d+$/.test(data.year)) {
@@ -115,7 +210,7 @@ const AddVehicle = () => {
       const response = await fetch(VEHICLE_API_URL, {
         method: "POST",
         headers: {
-            Authorization: `${localStorage.getItem('token')}`,
+          Authorization: `${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
@@ -123,7 +218,9 @@ const AddVehicle = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || "Creating vehicle failed!");
+        setError(
+          errorData.message || errorData.error || "Creating vehicle failed!"
+        );
       }
 
       const responseData = await response.json();
@@ -142,7 +239,6 @@ const AddVehicle = () => {
     setError("");
 
     try {
-      // Calling API function
       await createVehicle(formData);
     } catch (err) {
       setError(err.message || "Creating Vehicle failed. Please try again.");
@@ -195,7 +291,7 @@ const AddVehicle = () => {
             </div>
 
             <Input
-              label="year"
+              label="Year"
               name="year"
               value={formData.year}
               onChange={handleChange}
@@ -207,10 +303,11 @@ const AddVehicle = () => {
               <span>or</span>
               <Button onClick={handleScanButton}>Scan Plate</Button>
             </div>
+
             {isManual && (
               <>
                 <Input
-                  label="first 2 digits"
+                  label="First 2 digits"
                   name="first2digits"
                   value={formData.first2digits}
                   onChange={handleChange}
@@ -221,7 +318,7 @@ const AddVehicle = () => {
                   label="Letter"
                   dir="rtl"
                   className="text-right"
-                  value={formData.userType}
+                  value={formData.letter}
                   onChange={handleSelectChange}
                 >
                   {SELECT_LETTERS.map((item, index) => (
@@ -237,7 +334,7 @@ const AddVehicle = () => {
                 </Select>
 
                 <Input
-                  label="last 3 digits"
+                  label="Last 3 digits"
                   name="last3digits"
                   value={formData.last3digits}
                   onChange={handleChange}
@@ -254,7 +351,70 @@ const AddVehicle = () => {
               </>
             )}
 
-            {isScan && <div>Scan Plate</div>}
+            {isScan && (
+              <div className="space-y-4">
+                <div className="flex flex-col items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={isProcessing}
+                    className="mb-3"
+                  />
+
+                  {selectedImage && (
+                    <div className="mt-2 mb-4">
+                      <Typography variant="small" className="mb-2">
+                        Selected Image:
+                      </Typography>
+                      <img
+                        src={URL.createObjectURL(selectedImage)}
+                        alt="Plate preview"
+                        className="max-h-40 rounded-md"
+                      />
+                    </div>
+                  )}
+
+                  {isProcessing && (
+                    <Typography className="text-blue-500">
+                      Processing plate image...
+                    </Typography>
+                  )}
+
+                  {scanResult && !isProcessing && (
+                    <div className="mt-3 p-3 bg-gray-100 rounded-md w-full">
+                      <Typography variant="h6" className="mb-2">
+                        Detected Plate:
+                      </Typography>
+                      <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                          <Typography className="font-bold">
+                            {scanResult.first2digits}
+                          </Typography>
+                        </div>
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                          <Typography className="font-bold">
+                            {scanResult.letter}
+                          </Typography>
+                        </div>
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                          <Typography className="font-bold">
+                            {scanResult.last3digits}
+                          </Typography>
+                        </div>
+                        <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
+                          <Typography variant="small">City</Typography>
+                          <Typography className="font-bold">
+                            {scanResult.citycode}
+                          </Typography>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <Button
               type="submit"
               fullWidth
