@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Input,
@@ -9,6 +9,8 @@ import {
   Select,
   Option,
 } from "@material-tailwind/react";
+
+import {verifyToken} from "../../services/verifyToken"
 
 const VEHICLE_API_URL = import.meta.env.VITE_CREATE_VEHICLE_API_ENDPOINT;
 const PLATE_API_URL = import.meta.env.VITE_PLATE_API_URL;
@@ -55,6 +57,18 @@ const ENGLISH_TO_PERSIAN = {
 
 const AddVehicle = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isAuthenticated = await verifyToken();
+      if (!isAuthenticated) {
+        navigate("/login", { replace: true });
+      }
+    };
+
+
+    checkAuth();
+  }, [navigate]);
 
   const [formData, setFormData] = useState({
     first2digits: "",
