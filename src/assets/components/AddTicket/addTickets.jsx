@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { verifyToken } from "../../services/verifyToken";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -13,6 +13,7 @@ import {
 } from "@material-tailwind/react";
 
 const VERIFY_PLATE_URL = import.meta.env.VITE_VERIFY_PLATE_API_ENDPOINT;
+const CREATE_TICKET_URL = import.meta.env.VITE_CREATE_TICKET_API_ENDPOINT;
 
 const SELECT_LETTERS = [
   "ب",
@@ -49,7 +50,7 @@ const AddTicket = () => {
     officer_id: OFFICER_ID,
     amount: "",
     violation: "",
-    vehicleId: "",
+    vehicle_id: "",
   });
 
   useEffect(() => {
@@ -69,12 +70,22 @@ const AddTicket = () => {
       ...prev,
       [name]: value,
     }));
+    setIsPlateVerifSuccess(false);
   };
 
   const handleSelectChange = (value) => {
     setFormData((prev) => ({
       ...prev,
       letter: value,
+    }));
+    setIsPlateVerifSuccess(false);
+  };
+
+  const handleTicketChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -128,7 +139,7 @@ const AddTicket = () => {
       }
 
       const { vehicleId } = await response.json();
-      setFormData((prev) => ({ ...prev, vehicleId }));
+      setFormData((prev) => ({ ...prev, vehicle_id: vehicleId }));
 
       setError("");
       setIsPlateVerifSuccess(true);
@@ -139,7 +150,43 @@ const AddTicket = () => {
 
   const handleFormSubmission = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      if (!formData.amount || !formData.violation) {
+        throw new Error("Amount and violation are required !");
+      }
+
+      if (!/^\d+$/.test(formData.amount)) {
+        throw new Error("Amount must be digits !");
+      }
+
+      if (/^\d+$/.test(formData.violation)) {
+        throw new Error("Violation must be text");
+      }
+
+      const response = await fetch(`${CREATE_TICKET_URL}`, {
+        method: "POST",
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        
+        console.log(formData);
+        
+      
+        throw new Error(errorMessage.error);
+      }
+
+
+
+      navigate("/dashboard", { replace: true });
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -157,7 +204,7 @@ const AddTicket = () => {
           {!error && isPlateVerifSuccess && (
             <div className="flex flex-col gap-0">
               <Typography className="text-green-600 font-semibold">
-                Vehicle verification success
+                Vehicle verification success.
               </Typography>
             </div>
           )}
@@ -225,7 +272,7 @@ const AddTicket = () => {
                   name="amount"
                   type="number"
                   value={formData.amount}
-                  onChange={handleChange}
+                  onChange={handleTicketChange}
                   required
                 />
 
@@ -233,7 +280,7 @@ const AddTicket = () => {
                   label="Violation"
                   name="violation"
                   value={formData.violation}
-                  onChange={handleChange}
+                  onChange={handleTicketChange}
                   required
                 />
 
