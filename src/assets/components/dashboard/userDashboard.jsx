@@ -54,7 +54,7 @@ export default function Dashboard() {
         <p>Last Name: {userData.lname}</p>
         <p>National Code: {userData.codeMeli}</p>
         <p>Usertype: {userData.userType}</p>
-        <Vehicles vehicles={userData.vehicles} ownerID={userData.id}/>
+        <Vehicles vehicles={userData.vehicles}/>
         <div className="flex gap-4 justify-center mt-3">
           <Link onClick={logoutHandler} to={"/login"}>
             <Button className="bg-red-600">Logout</Button>

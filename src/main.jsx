@@ -10,6 +10,7 @@ import SignUp from "./assets/components/SignUp/signup.jsx";
 import Login from "./assets/components/Login/login.jsx";
 import Dashboard from "./assets/components/dashboard/userDashboard.jsx";
 import AddVehicle from "./assets/components/AddVehicle/addVehicle.jsx";
+import VehcleDetail from "./assets/components/dashboard/VehcleDetails.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
   { path: "/signup", element: <SignUp /> },
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/dashboard/add-vehicle", element: <AddVehicle /> },
+  { path: "/dashboard/vehicle/:vehicleId", element: <VehcleDetail /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
 

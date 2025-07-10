@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const Vehicles = ({ vehicles, ownerID }) => {
+const Vehicles = ({ vehicles }) => {
   const navigate = useNavigate();
   // Handle empty state
   if (!vehicles || vehicles.length === 0) {
@@ -8,8 +8,7 @@ const Vehicles = ({ vehicles, ownerID }) => {
   }
 
   const ViewVehicleDetail = ({ id }) => {
-    console.log("vehicle Id:", id);
-    console.log("Owner ID:", ownerID);
+    navigate(`/dashboard/vehicle/${id}`);
   };
 
   return (
