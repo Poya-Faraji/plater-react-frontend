@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { verifyToken } from "../../services/verifyToken";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -14,6 +14,7 @@ import {
 
 const VERIFY_PLATE_URL = import.meta.env.VITE_VERIFY_PLATE_API_ENDPOINT;
 const CREATE_TICKET_URL = import.meta.env.VITE_CREATE_TICKET_API_ENDPOINT;
+const PLATE_API_URL = import.meta.env.VITE_PLATE_API_URL;
 
 const SELECT_LETTERS = [
   "ب",
@@ -34,6 +35,25 @@ const SELECT_LETTERS = [
   "ز",
 ];
 
+const ENGLISH_TO_PERSIAN = {
+  be: "ب",
+  dal: "د",
+  ein: "ع",
+  he: "ح",
+  jim: "ج",
+  lam: "ل",
+  mim: "م",
+  nun: "ن",
+  qaf: "ق",
+  sad: "ص",
+  sin: "س",
+  ta: "ط",
+  te: "ت",
+  vav: "و",
+  ye: "ی",
+  zhe: "ز",
+};
+
 const OFFICER_ID = localStorage.getItem("officerId");
 
 const AddTicket = () => {
@@ -41,6 +61,12 @@ const AddTicket = () => {
 
   const [error, setError] = useState();
   const [isPlateVerifSuccess, setIsPlateVerifSuccess] = useState(false);
+
+  const [isManual, setIsManual] = useState(false);
+  const [isScan, setIsScan] = useState(false);
+  const [scanResult, setScanResult] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [formData, setFormData] = useState({
     first2digits: "",
@@ -174,18 +200,92 @@ const AddTicket = () => {
 
       if (!response.ok) {
         const errorMessage = await response.json();
-        
-        console.log(formData);
-        
-      
         throw new Error(errorMessage.error);
       }
-
-
 
       navigate("/dashboard", { replace: true });
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const handleManualButton = () => {
+    setIsManual(true);
+    setIsScan(false);
+    setScanResult(null);
+    setSelectedImage(null);
+  };
+
+  const handleScanButton = () => {
+    setIsManual(false);
+    setIsScan(true);
+  };
+
+  const processPlateImage = async (file) => {
+    setIsProcessing(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(PLATE_API_URL, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const mutliplePlateError = await response.json().then((data) => {
+          return data.detail;
+        });
+        if (mutliplePlateError) {
+          throw new Error(mutliplePlateError);
+        }
+
+        throw new Error("Failed to detect plate");
+      }
+
+      const result = await response.json();
+
+      if (
+        !result.first2digits ||
+        !result.letter ||
+        !result.last3digits ||
+        !result.citycode
+      ) {
+        throw new Error(
+          "Plate format is incorrect. Please provide correct plate format."
+        );
+      }
+
+      // Convert English letter to Persian
+      const persianLetter = ENGLISH_TO_PERSIAN[result.letter] || result.letter;
+
+      // Update form data with detected values
+      setFormData((prev) => ({
+        ...prev,
+        first2digits: result.first2digits,
+        letter: persianLetter,
+        last3digits: result.last3digits,
+        citycode: result.citycode,
+      }));
+
+      // Store result for display
+      setScanResult({
+        ...result,
+        letter: persianLetter,
+      });
+    } catch (err) {
+      setError("Plate detection error: " + err.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedImage(file);
+      processPlateImage(file);
     }
   };
 
@@ -209,87 +309,196 @@ const AddTicket = () => {
             </div>
           )}
 
-          <form className="mt-4 space-y-4" onSubmit={handleFormSubmission}>
-            <Input
-              label="First 2 digits"
-              type="number"
-              name="first2digits"
-              value={formData.first2digits}
-              onChange={handleChange}
-              required
-            />
+          <div className="flex items-center justify-center gap-3">
+            <Button onClick={handleManualButton}>Manual Plate</Button>
+            <span>or</span>
+            <Button onClick={handleScanButton}>Scan Plate</Button>
+          </div>
 
-            <Select
-              label="Letter"
-              dir="rtl"
-              className="text-right"
-              value={formData.letter}
-              onChange={handleSelectChange}
-            >
-              {SELECT_LETTERS.map((item, index) => (
-                <Option
-                  key={index}
-                  dir="rtl"
-                  value={item}
-                  className="text-right"
-                >
-                  {item}
-                </Option>
-              ))}
-            </Select>
+          {isManual && (
+            <form className="mt-4 space-y-4" onSubmit={handleFormSubmission}>
+              <Input
+                label="First 2 digits"
+                type="number"
+                name="first2digits"
+                value={formData.first2digits}
+                onChange={handleChange}
+                required
+              />
 
-            <Input
-              label="Last 3 digits"
-              name="last3digits"
-              type="number"
-              value={formData.last3digits}
-              onChange={handleChange}
-              required
-            />
+              <Select
+                label="Letter"
+                dir="rtl"
+                className="text-right"
+                value={formData.letter}
+                onChange={handleSelectChange}
+              >
+                {SELECT_LETTERS.map((item, index) => (
+                  <Option
+                    key={index}
+                    dir="rtl"
+                    value={item}
+                    className="text-right"
+                  >
+                    {item}
+                  </Option>
+                ))}
+              </Select>
 
-            <Input
-              label="City code"
-              name="citycode"
-              type="number"
-              value={formData.citycode}
-              onChange={handleChange}
-              required
-            />
+              <Input
+                label="Last 3 digits"
+                name="last3digits"
+                type="number"
+                value={formData.last3digits}
+                onChange={handleChange}
+                required
+              />
 
-            <Button
-              onClick={plateVerificationHandler}
-              type="button"
-              fullWidth
-              className="mt-6"
-            >
-              Verify Plate
-            </Button>
+              <Input
+                label="City code"
+                name="citycode"
+                type="number"
+                value={formData.citycode}
+                onChange={handleChange}
+                required
+              />
 
-            {!error && isPlateVerifSuccess && (
-              <>
-                <Input
-                  label="Amount"
-                  name="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={handleTicketChange}
-                  required
+              <Button
+                onClick={plateVerificationHandler}
+                type="button"
+                fullWidth
+                className="mt-6"
+              >
+                Verify Plate
+              </Button>
+
+              {!error && isPlateVerifSuccess && (
+                <>
+                  <Input
+                    label="Amount"
+                    name="amount"
+                    type="number"
+                    value={formData.amount}
+                    onChange={handleTicketChange}
+                    required
+                  />
+
+                  <Textarea
+                    label="Violation"
+                    name="violation"
+                    value={formData.violation}
+                    onChange={handleTicketChange}
+                    required
+                  />
+
+                  <Button className="w-full p-4" type="submit">
+                    Create Ticket
+                  </Button>
+                </>
+              )}
+            </form>
+          )}
+          {isScan && (
+            <div className="space-y-4">
+              <div className="flex flex-col items-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  disabled={isProcessing}
+                  className="mb-3"
                 />
 
-                <Textarea
-                  label="Violation"
-                  name="violation"
-                  value={formData.violation}
-                  onChange={handleTicketChange}
-                  required
-                />
+                {selectedImage && (
+                  <div className="mt-2 mb-4">
+                    <Typography variant="small" className="mb-2">
+                      Selected Image:
+                    </Typography>
+                    <img
+                      src={URL.createObjectURL(selectedImage)}
+                      alt="Plate preview"
+                      className="max-h-40 rounded-md"
+                    />
+                  </div>
+                )}
 
-                <Button className="w-full p-4" type="submit">
-                  Create Ticket
-                </Button>
-              </>
-            )}
-          </form>
+                {isProcessing && (
+                  <Typography className="text-blue-500">
+                    Processing plate image...
+                  </Typography>
+                )}
+
+                {scanResult && !isProcessing && (
+                  <>
+                    <div className="mt-3 p-3 bg-gray-100 rounded-md w-full">
+                      <Typography variant="h6" className="mb-2">
+                        Detected Plate:
+                      </Typography>
+                      <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                          <Typography className="font-bold">
+                            {scanResult.first2digits}
+                          </Typography>
+                        </div>
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                          <Typography className="font-bold">
+                            {scanResult.letter}
+                          </Typography>
+                        </div>
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                          <Typography className="font-bold">
+                            {scanResult.last3digits}
+                          </Typography>
+                        </div>
+                        <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
+                          <Typography variant="small">City</Typography>
+                          <Typography className="font-bold">
+                            {scanResult.citycode}
+                          </Typography>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={plateVerificationHandler}
+                      type="button"
+                      fullWidth
+                      className="mt-6"
+                    >
+                      Verify Plate
+                    </Button>
+                    {!error && isPlateVerifSuccess && (
+                      <form
+                        className="mt-4 space-y-4 w-full"
+                        onSubmit={handleFormSubmission}
+                      >
+                        <Input
+                          label="Amount"
+                          name="amount"
+                          type="number"
+                          value={formData.amount}
+                          onChange={handleTicketChange}
+                          required
+                          className="w-full"
+                        />
+
+                        <Textarea
+                          label="Violation"
+                          name="violation"
+                          value={formData.violation}
+                          onChange={handleTicketChange}
+                          required
+                        />
+
+                        <Button className="w-full p-4" type="submit">
+                          Create Ticket
+                        </Button>
+                      </form>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </CardBody>
       </Card>
     </div>

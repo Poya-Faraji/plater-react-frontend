@@ -22,9 +22,8 @@ export const getUserInfo = async () => {
 
     const data = await response.json();
     return (data)
-  } catch (error) {
-    console.log(error);
-
+  } catch {
+  
     localStorage.removeItem("token"); // Clean up invalid token
     return false;
   }

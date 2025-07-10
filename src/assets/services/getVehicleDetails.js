@@ -40,7 +40,6 @@ export const getVehicleDetails = async (vehicleId) => {
     
     return transformedData;
   } catch (error) {
-    console.error("Error fetching vehicle details:", error.message);
     
     // Handle specific error cases
     if (error.message.includes("404")) {

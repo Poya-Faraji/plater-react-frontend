@@ -22,10 +22,8 @@ export const verifyToken = async () => {
 
     const data = await response.json();
     return data.success;
-  } catch (error) {
+  } catch {
     // Token is invalid or expired
-    console.log(error);
-
     localStorage.removeItem("token"); // Clean up invalid token
     return false;
   }
