@@ -12,6 +12,10 @@ export default function Dashboard() {
     localStorage.clear();
   };
 
+
+  const setOfficerId = () => {
+    localStorage.setItem('officerId', userData.id)
+  }
   useEffect(() => {
     const checkAuth = async () => {
       const isAuthenticated = await verifyToken();
@@ -29,10 +33,6 @@ export default function Dashboard() {
     if (!userData.vehicles || userData.vehicles.length === 0) {
       return (
         <div>
-          <Link onClick={()=> localStorage.setItem("ownerID", userData.id)} to={"/dashboard/add-vehicle"}>
-            <Button>Add Vehicle</Button>
-          </Link>
-
           <h1>Welcome to dashboard OWNER</h1>
           <p>Username: {userData.username}</p>
           <p>First Name: {userData.fname}</p>
@@ -40,9 +40,17 @@ export default function Dashboard() {
           <p>National Code: {userData.codeMeli}</p>
           <p>Usertype: {userData.userType}</p>
 
-          <Link onClick={logoutHandler} to={"/login"}>
-            <Button className="bg-red-600">Logout</Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link onClick={logoutHandler} to={"/login"}>
+              <Button className="bg-red-600">Logout</Button>
+            </Link>
+            <Link
+              onClick={() => localStorage.setItem("ownerID", userData.id)}
+              to={"/dashboard/add-vehicle"}
+            >
+              <Button>Add Vehicle</Button>
+            </Link>
+          </div>
         </div>
       );
     }
@@ -54,12 +62,15 @@ export default function Dashboard() {
         <p>Last Name: {userData.lname}</p>
         <p>National Code: {userData.codeMeli}</p>
         <p>Usertype: {userData.userType}</p>
-        <Vehicles vehicles={userData.vehicles}/>
+        <Vehicles vehicles={userData.vehicles} />
         <div className="flex gap-4 justify-center mt-3">
           <Link onClick={logoutHandler} to={"/login"}>
             <Button className="bg-red-600">Logout</Button>
           </Link>
-          <Link onClick={()=> localStorage.setItem("ownerID", userData.id)} to={"/dashboard/add-vehicle"}>
+          <Link
+            onClick={() => localStorage.setItem("ownerID", userData.id)}
+            to={"/dashboard/add-vehicle"}
+          >
             <Button>Add Vehicle</Button>
           </Link>
         </div>
@@ -75,9 +86,14 @@ export default function Dashboard() {
       <p>Last Name: {userData.lname}</p>
       <p>National Code: {userData.codeMeli}</p>
       <p>Usertype: {userData.userType}</p>
-      <Link onClick={logoutHandler} to={"/login"}>
-        <Button className="bg-red-600">Logout</Button>
-      </Link>
+      <div className="flex gap-3">
+        <Link onClick={logoutHandler} to={"/login"}>
+          <Button className="bg-red-600">Logout</Button>
+        </Link>
+         <Link onClick={setOfficerId} to={"/dashboard/add-ticket"}>
+          <Button>Add Ticket</Button>
+        </Link>
+      </div>
     </div>
   );
 }
