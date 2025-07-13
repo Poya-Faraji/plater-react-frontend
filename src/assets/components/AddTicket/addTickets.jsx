@@ -54,8 +54,6 @@ const ENGLISH_TO_PERSIAN = {
   zhe: "ز",
 };
 
-const OFFICER_ID = localStorage.getItem("officerId");
-
 const AddTicket = () => {
   const navigate = useNavigate();
 
@@ -67,6 +65,8 @@ const AddTicket = () => {
   const [scanResult, setScanResult] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const OFFICER_ID = localStorage.getItem("officerId");
 
   const [formData, setFormData] = useState({
     first2digits: "",

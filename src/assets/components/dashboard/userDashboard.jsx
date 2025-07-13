@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { getUserInfo } from "../../services/getUserInfo";
 import Vehicles from "./vehicle";
 import { Button } from "@material-tailwind/react";
+
+import Officer from "../officer/officer";
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
@@ -12,10 +15,6 @@ export default function Dashboard() {
     localStorage.clear();
   };
 
-
-  const setOfficerId = () => {
-    localStorage.setItem('officerId', userData.id)
-  }
   useEffect(() => {
     const checkAuth = async () => {
       const isAuthenticated = await verifyToken();
@@ -30,6 +29,7 @@ export default function Dashboard() {
   }, [navigate]);
 
   if (userData.userType === "OWNER") {
+    localStorage.setItem("ownerID", userData.id);
     if (!userData.vehicles || userData.vehicles.length === 0) {
       return (
         <div>
@@ -44,10 +44,7 @@ export default function Dashboard() {
             <Link onClick={logoutHandler} to={"/login"}>
               <Button className="bg-red-600">Logout</Button>
             </Link>
-            <Link
-              onClick={() => localStorage.setItem("ownerID", userData.id)}
-              to={"/dashboard/add-vehicle"}
-            >
+            <Link to={"/dashboard/add-vehicle"}>
               <Button>Add Vehicle</Button>
             </Link>
           </div>
@@ -77,23 +74,9 @@ export default function Dashboard() {
       </div>
     );
   }
-
   return (
-    <div>
-      <h1>OFFICER</h1>
-      <p>Username: {userData.username}</p>
-      <p>First Name: {userData.fname}</p>
-      <p>Last Name: {userData.lname}</p>
-      <p>National Code: {userData.codeMeli}</p>
-      <p>Usertype: {userData.userType}</p>
-      <div className="flex gap-3">
-        <Link onClick={logoutHandler} to={"/login"}>
-          <Button className="bg-red-600">Logout</Button>
-        </Link>
-         <Link onClick={setOfficerId} to={"/dashboard/add-ticket"}>
-          <Button>Add Ticket</Button>
-        </Link>
-      </div>
-    </div>
+    <>
+      <Officer userData={userData} />
+    </>
   );
 }
