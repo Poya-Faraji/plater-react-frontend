@@ -229,6 +229,11 @@ const Officer = ({ userData }) => {
               <List className="p-0">
                 {officerData.tickets.map((ticket) => (
                   <ListItem
+                    onClick={() => {
+                      navigate(`/dashboard/tickets/${ticket.id}`, {
+                        state: { userData }, 
+                      });
+                    }}
                     key={ticket.id}
                     className="flex flex-col items-start p-4 mb-3 rounded-lg border border-gray-200"
                   >

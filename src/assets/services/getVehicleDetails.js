@@ -20,7 +20,7 @@ export const getVehicleDetails = async (vehicleId) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to fetch vehicle details");
+      throw new Error(errorData.error || "برگرداندن اطلاعات ماشین ناموفق بود . ");
     }
 
     const data = await response.json();
@@ -43,12 +43,12 @@ export const getVehicleDetails = async (vehicleId) => {
     
     // Handle specific error cases
     if (error.message.includes("404")) {
-      throw new Error("Vehicle not found");
+      throw new Error("ماشین مورد نظر یافت نشد");
     }
     
     if (error.message.includes("401") || error.message.includes("403")) {
       localStorage.removeItem("token");
-      throw new Error("Session expired. Please login again");
+      throw new Error("نشست به شما به اتمام رسیده است. لطفا دوباره وارد شوید ");
     }
     
     throw error;

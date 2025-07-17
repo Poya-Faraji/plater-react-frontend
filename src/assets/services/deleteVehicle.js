@@ -9,7 +9,7 @@ export const deleteVehicle = async (vehicleId) => {
 
   const token = localStorage.getItem('token');
   if (!token) {
-    throw new Error('Authentication token not found. Please login again.');
+    throw new Error('کد تایید هویت یافت نشد. لطفا دوباره وارد شوید');
   }
 
   try {
@@ -25,21 +25,21 @@ export const deleteVehicle = async (vehicleId) => {
 
     if (!response.ok) {
       if (response.status === 403) {
-        throw new Error(data.message || 'Vehicle has unpaid tickets and cannot be deleted');
+        throw new Error(data.message || 'وسیله نقلیه دارای جریمه‌های پرداخت نشده است و قابل حذف نیست');
       }
       if (response.status === 404) {
         throw new Error('Vehicle not found');
       }
-      throw new Error(data.message || 'Failed to delete vehicle');
+      throw new Error(data.message || 'حذف خودرو انجام نشد');
     }
 
     return data;
   } catch (error) {
     
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-      throw new Error('Network error. Please check your connection.');
+      throw new Error('خطای شبکه. لطفا اتصال خود را بررسی کنید..');
     }
     
-    throw new Error(error.message || 'Failed to delete vehicle');
+    throw new Error(error.message || 'حذف خودرو انجام نشد');
   }
 };

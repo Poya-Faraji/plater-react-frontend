@@ -10,11 +10,9 @@ import {
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 
-
-const REGISTER_API_URL = import.meta.env.VITE_REGISTER_API_ENDPOINT
+const REGISTER_API_URL = import.meta.env.VITE_REGISTER_API_ENDPOINT;
 
 const SignUp = () => {
-
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -56,7 +54,7 @@ const SignUp = () => {
       // Calling API function
       const response = await registerUser(formData);
 
-      localStorage.setItem("token", response.token)
+      localStorage.setItem("token", response.token);
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -141,9 +139,9 @@ const SignUp = () => {
       <Card className="w-full max-w-md">
         <CardBody className="flex flex-col gap-4">
           <Typography variant="h4" color="blue-gray">
-            Create an Account
+            ساخت حساب کاربری
           </Typography>
-
+          <p>فرم های زیر را پر کنید.</p>
           {error && (
             <Typography color="red" className="text-sm">
               {error}
@@ -153,14 +151,14 @@ const SignUp = () => {
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="First Name"
+                label="نام"
                 name="fname"
                 value={formData.fname}
                 onChange={handleChange}
                 required
               />
               <Input
-                label="Last Name"
+                label="نام خانوادگی"
                 name="lname"
                 value={formData.lname}
                 onChange={handleChange}
@@ -169,7 +167,7 @@ const SignUp = () => {
             </div>
 
             <Input
-              label="Username"
+              label="نام کاربری ( به لاتین  )"
               name="username"
               value={formData.username}
               onChange={handleChange}
@@ -177,7 +175,7 @@ const SignUp = () => {
             />
 
             <Input
-              label="Password"
+              label="گذرواژه"
               name="password"
               type="password"
               value={formData.password}
@@ -186,7 +184,7 @@ const SignUp = () => {
             />
 
             <Input
-              label="Code Meli"
+              label="کد ملی"
               name="codeMeli"
               value={formData.codeMeli}
               onChange={handleChange}
@@ -194,7 +192,7 @@ const SignUp = () => {
             />
 
             <Input
-              label="Phone Number"
+              label="تلفن همراه"
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleChange}
@@ -202,14 +200,14 @@ const SignUp = () => {
             />
 
             <Input
-              label="Postal Code"
+              label="کد پستی"
               name="postalCode"
               value={formData.postalCode}
               onChange={handleChange}
             />
 
             <Select
-              label="User Type"
+              label="نوع کاربر"
               value={formData.userType}
               onChange={handleSelectChange}
             >
@@ -219,7 +217,7 @@ const SignUp = () => {
 
             <textarea
               className="w-full border border-gray-400 rounded-lg p-1"
-              placeholder="Enter your address..."
+              placeholder="آدرس خود را وارد کنید..."
               name="address"
               value={formData.address}
               onChange={handleChange}
@@ -231,14 +229,14 @@ const SignUp = () => {
               disabled={isSubmitting}
               className="mt-6"
             >
-              {isSubmitting ? "Registering..." : "Register"}
+              {isSubmitting ? "در حال ثبت نام ..." : "ثبت نام"}
             </Button>
           </form>
 
           <div>
             <Link to={"/login"}>
-              Already have an account?{" "}
-              <p className="text-blue-500 inline">Login</p>
+              از قبل حساب کاربری دارید ؟{" "}
+              <p className="text-blue-500 inline">وارد شوید</p>
             </Link>
           </div>
         </CardBody>

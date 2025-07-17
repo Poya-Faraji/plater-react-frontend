@@ -17,14 +17,14 @@ export const getUserInfo = async () => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed fetching user info");
+      throw new Error("دریافت اطلاعات کاربر ناموفق بود");
     }
 
     const data = await response.json();
     return (data)
   } catch {
   
-    localStorage.removeItem("token"); // Clean up invalid token
+    localStorage.removeItem("token"); 
     return false;
   }
 };

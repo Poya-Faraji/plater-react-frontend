@@ -19,14 +19,14 @@ export const getOfficerTickets = async () => {
         return []; 
       }
       const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to fetch tickets");
+      throw new Error(errorData.error || "خطا در دریافت جریمه ها");
     }
 
     const data = await response.json();
 
     return data
   } catch (error) {
-    console.error("Error fetching officer tickets:", error);
+    console.error("خدا در دریافت جریمه های ثبت شده", error);
     throw error;
   }
 };

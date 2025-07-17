@@ -125,29 +125,29 @@ const AddTicket = () => {
         !formData.first2digits ||
         !formData.last3digits
       ) {
-        throw new Error("All fields are required !");
+        throw new Error("لطفا تمامی فرم ها رو پرکنید !");
       }
 
       if (
         formData.first2digits.length !== 2 ||
         !/^\d+$/.test(formData.first2digits)
       ) {
-        throw new Error("First 2 digits must be 2 digits");
+        throw new Error("دو رقم اول حتما باید عدد 2 رقمی باشد !");
       }
 
       if (formData.letter.length !== 1 || /^\d+$/.test(formData.letter)) {
-        throw new Error("Plate letter must be 1 character");
+        throw new Error("حرف پلاک باید یک حرف باشد !");
       }
 
       if (
         formData.last3digits.length !== 3 ||
         !/^\d+$/.test(formData.last3digits)
       ) {
-        throw new Error("Last 3 digits must be 3 digits");
+        throw new Error("سه رقم آخر حتما باید عدد 3 رقمی باشد !");
       }
 
       if (formData.citycode.length !== 2 || !/^\d+$/.test(formData.citycode)) {
-        throw new Error("City code must be 2 digits");
+        throw new Error("کد شهری حتما باید عدد 2 رقمی باشد !");
       }
 
       const response = await fetch(`${VERIFY_PLATE_URL}`, {
@@ -178,15 +178,15 @@ const AddTicket = () => {
     e.preventDefault();
     try {
       if (!formData.amount || !formData.violation) {
-        throw new Error("Amount and violation are required !");
+        throw new Error("مقدار جریمه و توضیحات اجبباری میباشد !");
       }
 
       if (!/^\d+$/.test(formData.amount)) {
-        throw new Error("Amount must be digits !");
+        throw new Error("مقدار باید عدد باشد !");
       }
 
       if (/^\d+$/.test(formData.violation)) {
-        throw new Error("Violation must be text");
+        throw new Error("توضیحات جریمه باید متن باشد !");
       }
 
       const response = await fetch(`${CREATE_TICKET_URL}`, {
@@ -242,7 +242,7 @@ const AddTicket = () => {
           throw new Error(mutliplePlateError);
         }
 
-        throw new Error("Failed to detect plate");
+        throw new Error("تشخیص پلاک ناموفق بود");
       }
 
       const result = await response.json();
@@ -254,7 +254,7 @@ const AddTicket = () => {
         !result.citycode
       ) {
         throw new Error(
-          "Plate format is incorrect. Please provide correct plate format."
+          "نوع پلاک اشتباه میباشد. لطفا پلاک را بدرستی وارد کنید."
         );
       }
 
@@ -276,7 +276,7 @@ const AddTicket = () => {
         letter: persianLetter,
       });
     } catch (err) {
-      setError("Plate detection error: " + err.message);
+      setError("مشکل در تشخیص پلاک : " + err.message);
     } finally {
       setIsProcessing(false);
     }
@@ -294,7 +294,7 @@ const AddTicket = () => {
       <Card className="w-full max-w-md">
         <CardBody className="flex flex-col gap-4">
           <Typography variant="h4" color="blue-gray">
-            Create a new Ticket
+            ثبت جریمه جدید
           </Typography>
           {error && (
             <Typography color="red" className="font-semibold">
@@ -304,21 +304,21 @@ const AddTicket = () => {
           {!error && isPlateVerifSuccess && (
             <div className="flex flex-col gap-0">
               <Typography className="text-green-600 font-semibold">
-                Vehicle verification success.
+                بررسی صحت پلاک تایید شد
               </Typography>
             </div>
           )}
 
           <div className="flex items-center justify-center gap-3">
-            <Button onClick={handleManualButton}>Manual Plate</Button>
-            <span>or</span>
-            <Button onClick={handleScanButton}>Scan Plate</Button>
+            <Button onClick={handleManualButton}>پلاک دستی</Button>
+            <span>یا</span>
+            <Button onClick={handleScanButton}>اسکن پلاک</Button>
           </div>
 
           {isManual && (
             <form className="mt-4 space-y-4" onSubmit={handleFormSubmission}>
               <Input
-                label="First 2 digits"
+                label="دو رقم اول"
                 type="number"
                 name="first2digits"
                 value={formData.first2digits}
@@ -327,7 +327,7 @@ const AddTicket = () => {
               />
 
               <Select
-                label="Letter"
+                label="حرف"
                 dir="rtl"
                 className="text-right"
                 value={formData.letter}
@@ -346,7 +346,7 @@ const AddTicket = () => {
               </Select>
 
               <Input
-                label="Last 3 digits"
+                label="3 رقم آخر"
                 name="last3digits"
                 type="number"
                 value={formData.last3digits}
@@ -355,7 +355,7 @@ const AddTicket = () => {
               />
 
               <Input
-                label="City code"
+                label="کد شهر"
                 name="citycode"
                 type="number"
                 value={formData.citycode}
@@ -369,13 +369,13 @@ const AddTicket = () => {
                 fullWidth
                 className="mt-6"
               >
-                Verify Plate
+                بررسی صحت پلاک
               </Button>
 
               {!error && isPlateVerifSuccess && (
                 <>
                   <Input
-                    label="Amount"
+                    label="مقدار جریمه ( به ریال ) "
                     name="amount"
                     type="number"
                     value={formData.amount}
@@ -384,7 +384,7 @@ const AddTicket = () => {
                   />
 
                   <Textarea
-                    label="Violation"
+                    label="علت جریمه"
                     name="violation"
                     value={formData.violation}
                     onChange={handleTicketChange}
@@ -392,7 +392,7 @@ const AddTicket = () => {
                   />
 
                   <Button className="w-full p-4" type="submit">
-                    Create Ticket
+                    ثبت جریمه
                   </Button>
                 </>
               )}
@@ -424,7 +424,7 @@ const AddTicket = () => {
 
                 {isProcessing && (
                   <Typography className="text-blue-500">
-                    Processing plate image...
+                    در حال پردازش پلاک ماشین ...
                   </Typography>
                 )}
 
@@ -432,12 +432,18 @@ const AddTicket = () => {
                   <>
                     <div className="mt-3 p-3 bg-gray-100 rounded-md w-full">
                       <Typography variant="h6" className="mb-2">
-                        Detected Plate:
+                        پلاک یافت شده :
                       </Typography>
                       <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
+                          <Typography variant="small">شهر</Typography>
+                          <Typography className="font-bold">
+                            {scanResult.citycode}
+                          </Typography>
+                        </div>
                         <div className="bg-white p-2 rounded flex justify-center items-center">
                           <Typography className="font-bold">
-                            {scanResult.first2digits}
+                            {scanResult.last3digits}
                           </Typography>
                         </div>
                         <div className="bg-white p-2 rounded flex justify-center items-center">
@@ -447,13 +453,7 @@ const AddTicket = () => {
                         </div>
                         <div className="bg-white p-2 rounded flex justify-center items-center">
                           <Typography className="font-bold">
-                            {scanResult.last3digits}
-                          </Typography>
-                        </div>
-                        <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
-                          <Typography variant="small">City</Typography>
-                          <Typography className="font-bold">
-                            {scanResult.citycode}
+                            {scanResult.first2digits}
                           </Typography>
                         </div>
                       </div>
@@ -464,7 +464,7 @@ const AddTicket = () => {
                       fullWidth
                       className="mt-6"
                     >
-                      Verify Plate
+                      بررسی صحت پلاک خودرو
                     </Button>
                     {!error && isPlateVerifSuccess && (
                       <form

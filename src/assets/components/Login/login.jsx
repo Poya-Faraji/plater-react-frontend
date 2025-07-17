@@ -42,7 +42,7 @@ const Login = () => {
       localStorage.setItem("token", response.token);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
+      setError(err.message || "ثبت نام غیر موفق بود. لطفا دوباره تلاش کنید.");
     } finally {
       setIsSubmitting(false);
     }
@@ -52,11 +52,11 @@ const Login = () => {
   const loginUser = async (data) => {
     // Validate required fields
     if (!data.username || !data.password) {
-      throw new Error("Username and Password are both required");
+      throw new Error("نام کاربری و گذرواژه هر دو اجباری میشباشد.");
     }
 
     if (data.password.length < 6) {
-      throw new Error("Password must be at least 6 characters long");
+      throw new Error("طول گذرواژه حداقل باید 6 کاراکتر باشد.");
     }
 
     try {
@@ -70,7 +70,7 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Login failed!");
+        setError(errorData.error || "ورود ناموفق");
       }
 
       const responseData = await response.json();
@@ -95,9 +95,9 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardBody className="flex flex-col gap-3">
           <Typography variant="h5" color="blue-gray">
-            Login to account
+            وارد حساب خود شوید
           </Typography>
-          <p>Enter your username and password to login</p>
+          <p>نام کاربری و گذرواژه خود را وارد کنید.</p>
           {error && (
             <Typography color="red" className="text-sm">
               {error}
@@ -106,7 +106,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             <Input
-              label="Username"
+              label="نام کاربری"
               name="username"
               value={formData.username}
               onChange={handleChange}
@@ -114,7 +114,7 @@ const Login = () => {
             />
 
             <Input
-              label="Password"
+              label="گذرواژه"
               name="password"
               type="password"
               value={formData.password}
@@ -128,14 +128,14 @@ const Login = () => {
               disabled={isSubmitting}
               className="mt-6"
             >
-              {isSubmitting ? "Loging in..." : "Login"}
+              {isSubmitting ? "در حال ورود..." : "ورود"}
             </Button>
           </form>
 
           <div>
             <Link to={"/signup"}>
-              Don't have an account?
-              <p className="text-blue-500 inline"> Create an account</p>
+              حساب کابری ندارید ؟ 
+              <p className="text-blue-500 inline"> ساخت حساب جدید</p>
             </Link>
           </div>
         </CardBody>
