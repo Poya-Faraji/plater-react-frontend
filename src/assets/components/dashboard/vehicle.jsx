@@ -1,57 +1,55 @@
 import { useNavigate } from "react-router-dom";
+import { Card, Typography } from "@material-tailwind/react";
 
 const Vehicles = ({ vehicles }) => {
   const navigate = useNavigate();
-  // Handle empty state
-  if (!vehicles || vehicles.length === 0) {
-    return navigate("/add-vehicle", { replace: true });
-  }
 
-  const ViewVehicleDetail = ({ id }) => {
+  const viewVehicleDetail = (id) => {
     navigate(`/dashboard/vehicle/${id}`);
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold mb-4">Your Vehicles</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {vehicles.map((vehicle) => (
-          <div
-            onClick={() => ViewVehicleDetail(vehicle)}
+          <Card
             key={`${vehicle.first2digits}-${vehicle.letter}-${vehicle.last3digits}-${vehicle.citycode}`}
-            className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => viewVehicleDetail(vehicle.id)}
           >
             <div className="flex justify-between items-start">
               <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                {vehicle.year || "N/A"}
+                {vehicle.year || "نامشخص"}
               </span>
-              <h3 className="font-semibold text-lg">
-                {vehicle.model || "Unknown Model"}
-              </h3>
+              <Typography variant="h6" className="font-semibold">
+                {vehicle.model || "مدل نامشخص"}
+              </Typography>
             </div>
 
-            <div className="mt-2">
-              <p className="text-gray-600">License Plate:</p>
-              <p
-                dir="rtl"
-                className="text-xl text-center font-mono bg-gray-100 p-2 rounded"
+            <div className="mt-4">
+              <Typography variant="small" className="text-gray-600 text-right">
+                پلاک وسیله نقلیه:
+              </Typography>
+              <Typography
+                variant="h6"
+                className="text-center font-mono bg-gray-100 p-2 rounded mt-1"
               >
                 {vehicle.first2digits} | {vehicle.last3digits} |{" "}
                 {vehicle.letter} | {vehicle.citycode}
-              </p>
+              </Typography>
             </div>
 
-            <div className="mt-2 flex justify-between items-start">
-              <span>Color: </span>
-              <span className="font-semibold text-lg">
-                {vehicle.color || "Color not specified"}
-              </span>
+            <div className="mt-4 flex justify-between items-center">
+              <Typography variant="small">رنگ:</Typography>
+              <Typography variant="small" className="font-medium">
+                {vehicle.color || "نامشخص"}
+              </Typography>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     </div>
   );
 };
 
-export default Vehicles;
+export default Vehicles;  

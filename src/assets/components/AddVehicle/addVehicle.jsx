@@ -147,7 +147,7 @@ const AddVehicle = () => {
           throw new Error(mutliplePlateError);
         }
 
-        throw new Error("Failed to detect plate");
+        throw new Error("شناسایی پلاک ناموفق بود");
       }
 
       const result = await response.json();
@@ -159,7 +159,7 @@ const AddVehicle = () => {
         !result.citycode
       ) {
         throw new Error(
-          "Plate format is incorrect. Please provide correct plate format."
+          "قالب پلاک اشتباه است. لطفاً قالب صحیح پلاک را ارائه دهید."
         );
       }
 
@@ -181,7 +181,7 @@ const AddVehicle = () => {
         letter: persianLetter,
       });
     } catch (err) {
-      setError("Plate detection error: " + err.message);
+      setError("خطای تشخیص پلاک: " + err.message);
     } finally {
       setIsProcessing(false);
     }
@@ -197,27 +197,27 @@ const AddVehicle = () => {
       !data.color ||
       !data.year
     ) {
-      throw new Error("All fields are required");
+      throw new Error("همه فیلدها الزامی است");
     }
 
     if (data.first2digits.length !== 2 || !/^\d+$/.test(data.first2digits)) {
-      throw new Error("First 2 digits must be 2 digits");
+      throw new Error("دو رقم اول باید دو رقمی باشند");
     }
 
     if (data.letter.length !== 1 || /^\d+$/.test(data.letter)) {
-      throw new Error("Plate letter must be 1 character");
+      throw new Error("حرف پلاک باید ۱ کاراکتر باشد");
     }
 
     if (data.last3digits.length !== 3 || !/^\d+$/.test(data.last3digits)) {
-      throw new Error("Last 3 digits must be 3 digits");
+      throw new Error("سه رقم آخر باید سه رقم باشد");
     }
 
     if (data.citycode.length !== 2 || !/^\d+$/.test(data.citycode)) {
-      throw new Error("City code must be 2 digits");
+      throw new Error("کد شهر باید ۲ رقمی باشد");
     }
 
     if (/^\d+$/.test(data.model) || /^\d+$/.test(data.color)) {
-      throw new Error("Model and Color must be words");
+      throw new Error("مدل و رنگ باید کلمه باشند");
     }
 
     if (data.year.length !== 4 || !/^\d+$/.test(data.year)) {
@@ -237,7 +237,7 @@ const AddVehicle = () => {
       if (!response.ok) {
         const errorData = await response.json();
         setError(
-          errorData.message || errorData.error || "Creating vehicle failed!"
+          errorData.message || errorData.error || "ایجاد وسیله نقلیه ناموفق بود!"
         );
       }
 
@@ -281,7 +281,7 @@ const AddVehicle = () => {
       <Card className="w-full max-w-md">
         <CardBody className="flex flex-col gap-4">
           <Typography variant="h4" color="blue-gray">
-            Create a new Vehicle
+            اضافه کردن ماشین جدید
           </Typography>
 
           {error && (
@@ -293,14 +293,14 @@ const AddVehicle = () => {
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Model"
+                label="مدل ماشین"
                 name="model"
                 value={formData.model}
                 onChange={handleChange}
                 required
               />
               <Input
-                label="Color"
+                label="رنگ"
                 name="color"
                 value={formData.color}
                 onChange={handleChange}
@@ -309,7 +309,7 @@ const AddVehicle = () => {
             </div>
 
             <Input
-              label="Year"
+              label="سال"
               name="year"
               value={formData.year}
               onChange={handleChange}
@@ -317,15 +317,15 @@ const AddVehicle = () => {
             />
 
             <div className="flex items-center justify-center gap-3">
-              <Button onClick={handleManualButton}>Manual Plate</Button>
-              <span>or</span>
-              <Button onClick={handleScanButton}>Scan Plate</Button>
+              <Button onClick={handleManualButton}>پلاک دستی</Button>
+              <span>یا</span>
+              <Button onClick={handleScanButton}>اسکن پلاک</Button>
             </div>
 
             {isManual && (
               <>
                 <Input
-                  label="First 2 digits"
+                  label="دو رقم اول"
                   name="first2digits"
                   value={formData.first2digits}
                   onChange={handleChange}
@@ -333,7 +333,7 @@ const AddVehicle = () => {
                 />
 
                 <Select
-                  label="Letter"
+                  label="حرف"
                   dir="rtl"
                   className="text-right"
                   value={formData.letter}
@@ -352,7 +352,7 @@ const AddVehicle = () => {
                 </Select>
 
                 <Input
-                  label="Last 3 digits"
+                  label="سه رقم آخر"
                   name="last3digits"
                   value={formData.last3digits}
                   onChange={handleChange}
@@ -360,7 +360,7 @@ const AddVehicle = () => {
                 />
 
                 <Input
-                  label="City code"
+                  label="کد شهر"
                   name="citycode"
                   value={formData.citycode}
                   onChange={handleChange}
@@ -395,7 +395,7 @@ const AddVehicle = () => {
 
                   {isProcessing && (
                     <Typography className="text-blue-500">
-                      Processing plate image...
+                      در حال پردازش تصویر پلاک ...
                     </Typography>
                   )}
 
@@ -439,7 +439,7 @@ const AddVehicle = () => {
               disabled={isSubmitting}
               className="mt-6"
             >
-              {isSubmitting ? "Creating Vehicle..." : "Add Vehicle"}
+              {isSubmitting ? "در حال اضافه کردن ماشین ..." : "اضافه کردن ماشین"}
             </Button>
           </form>
         </CardBody>

@@ -2,18 +2,13 @@ import { useEffect, useState } from "react";
 import { verifyToken } from "../../services/verifyToken";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserInfo } from "../../services/getUserInfo";
-import Vehicles from "./vehicle";
-import { Button } from "@material-tailwind/react";
-
 import Officer from "../officer/officer";
+import Owner from "../Owner/owner";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
-
-  const logoutHandler = () => {
-    localStorage.clear();
-  };
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,60 +18,33 @@ export default function Dashboard() {
       }
     };
 
-    getUserInfo().then((data) => setUserData(data));
+    const fetchUserData = async () => {
+      try {
+        const data = await getUserInfo();
+        setUserData(data);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     checkAuth();
+    fetchUserData();
   }, [navigate]);
 
-  if (userData.userType === "OWNER") {
-    localStorage.setItem("ownerID", userData.id);
-    if (!userData.vehicles || userData.vehicles.length === 0) {
-      return (
-        <div>
-          <h1>Welcome to dashboard OWNER</h1>
-          <p>Username: {userData.username}</p>
-          <p>First Name: {userData.fname}</p>
-          <p>Last Name: {userData.lname}</p>
-          <p>National Code: {userData.codeMeli}</p>
-          <p>Usertype: {userData.userType}</p>
-
-          <div className="flex gap-3">
-            <Link onClick={logoutHandler} to={"/login"}>
-              <Button className="bg-red-600">Logout</Button>
-            </Link>
-            <Link to={"/dashboard/add-vehicle"}>
-              <Button>Add Vehicle</Button>
-            </Link>
-          </div>
-        </div>
-      );
-    }
+  if (loading) {
     return (
-      <div>
-        <h1>Welcome to dashboard OWNER</h1>
-        <p>Username: {userData.username}</p>
-        <p>First Name: {userData.fname}</p>
-        <p>Last Name: {userData.lname}</p>
-        <p>National Code: {userData.codeMeli}</p>
-        <p>Usertype: {userData.userType}</p>
-        <Vehicles vehicles={userData.vehicles} />
-        <div className="flex gap-4 justify-center mt-3">
-          <Link onClick={logoutHandler} to={"/login"}>
-            <Button className="bg-red-600">Logout</Button>
-          </Link>
-          <Link
-            onClick={() => localStorage.setItem("ownerID", userData.id)}
-            to={"/dashboard/add-vehicle"}
-          >
-            <Button>Add Vehicle</Button>
-          </Link>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-  return (
-    <>
-      <Officer userData={userData} />
-    </>
-  );
+
+  
+  if (userData.userType === "OWNER") {
+    return <Owner userData={userData} />;
+  } 
+ 
+  return <Officer userData={userData} />;
 }

@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "IranSans";
+  src: url("../public/Fonts/IranSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: "Vazir";
+  src: url("../public/Fonts/Vazir-Medium-FD-WOL.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+body,h5 {
+  font-family: "Vazir", sans-serif !important;
+}
+
