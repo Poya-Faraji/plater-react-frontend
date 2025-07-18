@@ -119,11 +119,11 @@ const TicketDetail = () => {
       />
       
       <div className="container mx-auto px-4">
-        <div className="mb-6">
+        <div className="mb-6 ml-auto">
           <Button
             variant="text"
             color="blue-gray"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 mr-auto"
             onClick={() => navigate('/dashboard')}
           >
             <ArrowLeftIcon className="h-5 w-5" />

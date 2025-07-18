@@ -104,17 +104,17 @@ const Owner = ({ userData }) => {
         <div className="flex justify-center mb-6 gap-4">
           <Button
             color="red"
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
             onClick={logoutHandler}
           >
-            <ArrowRightOnRectangleIcon className="h-5 w-5" />
             خروج
+            <ArrowRightOnRectangleIcon className="h-5 w-5" />
           </Button>
 
           <Link to="/dashboard/add-vehicle">
             <Button color="blue" className="flex items-center gap-2">
-              <PlusIcon className="h-5 w-5" />
               افزودن وسیله نقلیه
+              <PlusIcon className="h-5 w-5" />
             </Button>
           </Link>
         </div>
@@ -124,7 +124,7 @@ const Owner = ({ userData }) => {
           <CardBody className="p-4">
             <div className="flex items-center mb-4">
               <TruckIcon className="h-6 w-6 text-blue-500 mr-2" />
-              <Typography variant="h5" color="blue-gray">
+              <Typography className="mr-3" variant="h5" color="blue-gray">
                 وسایل نقلیه
               </Typography>
               {userData.vehicles?.length > 0 && (
@@ -139,7 +139,7 @@ const Owner = ({ userData }) => {
             </div>
 
             {!userData.vehicles || userData.vehicles.length === 0 ? (
-              // Empty Vehicles State
+              
               <div className="text-center py-8">
                 <TruckIcon className="h-16 w-16 mx-auto text-gray-400" />
                 <Typography color="gray" className="mt-4">
@@ -152,7 +152,6 @@ const Owner = ({ userData }) => {
                 </Link>
               </div>
             ) : (
-              // Use your Vehicles component here
               <Vehicles vehicles={userData.vehicles} />
             )}
           </CardBody>

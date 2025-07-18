@@ -199,11 +199,13 @@ export default function VehicleDetail() {
                   پلاک خودرو
                 </Typography>
                 <Typography variant="h3" color="white" className="font-bold mt-1">
-                  {vehicle.first2digits}
-                  <span className="mx-1">{vehicle.letter}</span>
                   {vehicle.last3digits}
                   <span className="mx-1">-</span>
                   {vehicle.citycode}
+                  <span className="mx-1">-</span>
+                  <span className="mx-1">{vehicle.letter}</span>
+                  <span className="mx-1">-</span>
+                  {vehicle.first2digits}
                 </Typography>
               </div>
               <Badge
@@ -375,7 +377,7 @@ export default function VehicleDetail() {
                             {formatDate(ticket.issuedAt)}
                           </Typography>
                         </div>
-                        <div className="ml-auto">
+                        <div className="mr-auto">
                           <Chip
                             value={getStatusText(ticket.status)}
                             color={getStatusColor(ticket.status)}

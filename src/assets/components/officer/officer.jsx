@@ -179,7 +179,7 @@ const Officer = ({ userData }) => {
           <Link to={"/dashboard/add-ticket"}>
             <Button color="blue" className="flex items-center gap-2">
               <PlusIcon className="h-5 w-5" />
-              ثبت قبض جدید
+              ثبت جریمه جدید
             </Button>
           </Link>
         </div>
@@ -190,7 +190,7 @@ const Officer = ({ userData }) => {
             <div className="flex items-center mb-4">
               <TicketIcon className="h-6 w-6 text-blue-500 mr-2" />
               <Typography variant="h5" color="blue-gray">
-                قبض‌های ثبت شده
+                جریمه ثبت شده
               </Typography>
               {!loading && officerData.count > 0 && (
                 <Chip
