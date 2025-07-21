@@ -227,7 +227,7 @@ const Officer = ({ userData }) => {
             ) : (
               // Tickets List
               <List className="p-0">
-                {officerData.tickets.map((ticket) => (
+                {(officerData.tickets || []).map((ticket) => (
                   <ListItem
                     onClick={() => {
                       navigate(`/dashboard/tickets/${ticket.id}`, {

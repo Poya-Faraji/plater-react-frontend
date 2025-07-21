@@ -10,11 +10,10 @@ import {
   Option,
 } from "@material-tailwind/react";
 
-import {verifyToken} from "../../services/verifyToken"
+import { verifyToken } from "../../services/verifyToken";
 
 const VEHICLE_API_URL = import.meta.env.VITE_CREATE_VEHICLE_API_ENDPOINT;
 const PLATE_API_URL = import.meta.env.VITE_PLATE_API_URL;
-
 
 const SELECT_LETTERS = [
   "ب",
@@ -55,23 +54,19 @@ const ENGLISH_TO_PERSIAN = {
 };
 
 const AddVehicle = () => {
-
   const OWNER_ID = localStorage.getItem("ownerID");
   const navigate = useNavigate();
 
   useEffect(() => {
-     
-     
     const checkAuth = async () => {
       const isAuthenticated = await verifyToken();
       if (!isAuthenticated) {
         navigate("/login", { replace: true });
       }
-      if(!OWNER_ID) {
-        navigate('/dashboard', {replace: true})
+      if (!OWNER_ID) {
+        navigate("/dashboard", { replace: true });
       }
     };
-
 
     checkAuth();
   }, [navigate]);
@@ -237,7 +232,9 @@ const AddVehicle = () => {
       if (!response.ok) {
         const errorData = await response.json();
         setError(
-          errorData.message || errorData.error || "ایجاد وسیله نقلیه ناموفق بود!"
+          errorData.message ||
+            errorData.error ||
+            "ایجاد وسیله نقلیه ناموفق بود!"
         );
       }
 
@@ -412,12 +409,12 @@ const AddVehicle = () => {
                         </div>
                         <div className="bg-white p-2 rounded flex justify-center items-center">
                           <Typography className="font-bold">
-                            {scanResult.letter}
+                            {scanResult.last3digits}
                           </Typography>
                         </div>
                         <div className="bg-white p-2 rounded flex justify-center items-center">
                           <Typography className="font-bold">
-                            {scanResult.last3digits}
+                            {scanResult.letter}
                           </Typography>
                         </div>
                         <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
@@ -439,7 +436,9 @@ const AddVehicle = () => {
               disabled={isSubmitting}
               className="mt-6"
             >
-              {isSubmitting ? "در حال اضافه کردن ماشین ..." : "اضافه کردن ماشین"}
+              {isSubmitting
+                ? "در حال اضافه کردن ماشین ..."
+                : "اضافه کردن ماشین"}
             </Button>
           </form>
         </CardBody>
