@@ -233,8 +233,8 @@ const AddVehicle = () => {
         const errorData = await response.json();
         setError(
           errorData.message ||
-            errorData.error ||
-            "ایجاد وسیله نقلیه ناموفق بود!"
+          errorData.error ||
+          "ایجاد وسیله نقلیه ناموفق بود!"
         );
       }
 
@@ -402,9 +402,10 @@ const AddVehicle = () => {
                         Detected Plate:
                       </Typography>
                       <div className="grid grid-cols-4 gap-2 text-center">
-                        <div className="bg-white p-2 rounded flex justify-center items-center">
+                        <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
+                          <Typography variant="small">City</Typography>
                           <Typography className="font-bold">
-                            {scanResult.first2digits}
+                            {scanResult.citycode}
                           </Typography>
                         </div>
                         <div className="bg-white p-2 rounded flex justify-center items-center">
@@ -417,10 +418,9 @@ const AddVehicle = () => {
                             {scanResult.letter}
                           </Typography>
                         </div>
-                        <div className="bg-white p-2 rounded flex flex-col justify-center items-center">
-                          <Typography variant="small">City</Typography>
+                        <div className="bg-white p-2 rounded flex justify-center items-center">
                           <Typography className="font-bold">
-                            {scanResult.citycode}
+                            {scanResult.first2digits}
                           </Typography>
                         </div>
                       </div>
