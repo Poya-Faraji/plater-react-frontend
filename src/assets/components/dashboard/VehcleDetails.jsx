@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { 
-  Card, 
-  CardHeader, 
-  CardBody, 
-  CardFooter, 
-  Typography, 
-  Button, 
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Typography,
+  Button,
   Chip,
   Badge,
   List,
@@ -17,9 +17,9 @@ import {
   AccordionHeader,
   AccordionBody
 } from "@material-tailwind/react";
-import { 
-  ArrowLeftIcon, 
-  TrashIcon, 
+import {
+  ArrowLeftIcon,
+  TrashIcon,
   DocumentTextIcon,
   UserIcon,
   TicketIcon,
@@ -32,18 +32,17 @@ import { verifyToken } from "../../services/verifyToken";
 import { useNavigate, useParams } from "react-router-dom";
 import { getVehicleDetails } from "../../services/getVehicleDetails";
 import { deleteVehicle } from "../../services/deleteVehicle";
-
-
+import { payTicket } from "../../services/payTicket";
 export default function VehicleDetail() {
   const navigate = useNavigate();
   const { vehicleId } = useParams();
 
-  
   const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openTicket, setOpenTicket] = useState(null);
-  
+  const [payingTicketId, setPayingTicketId] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,7 +52,7 @@ export default function VehicleDetail() {
           navigate("/login", { replace: true });
           return;
         }
-        
+
         const data = await getVehicleDetails(vehicleId);
         setVehicle(data);
         setLoading(false)
@@ -64,10 +63,10 @@ export default function VehicleDetail() {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [navigate, vehicleId]);
-  
+
   const handleDelete = async () => {
     if (vehicle?.hasUnpaidTickets) {
       alert("امکان حذف خودرو با قبض‌های پرداخت نشده وجود ندارد");
@@ -86,11 +85,53 @@ export default function VehicleDetail() {
       setError(err)
     }
   };
-  
+
   const handleToggleTicket = (ticketId) => {
     setOpenTicket(openTicket === ticketId ? null : ticketId);
   };
+
+ const handlePayment = async (ticketId) => {
+  setPayingTicketId(ticketId);
   
+  try {
+    // Call the API service
+    const result = await payTicket(ticketId);
+    
+    // Update local state
+    setVehicle(prev => {
+      const updatedTickets = prev.tickets.map(ticket => 
+        ticket.id === ticketId 
+          ? { 
+              ...ticket, 
+              status: "PAID",
+              payments: [
+                ...ticket.payments,
+                {
+                  id: result.paymentId,
+                  paidAt: new Date().toISOString(),
+                  amount: ticket.amount,
+                  method: result.method || "آنلاین"
+                }
+              ]
+            } 
+          : ticket
+      );
+      
+      return {
+        ...prev,
+        tickets: updatedTickets,
+        hasUnpaidTickets: updatedTickets.some(t => t.status === "UNPAID")
+      };
+    });
+    
+  } catch (err) {
+    console.error("Payment failed:", err);
+    alert(err.message || "پرداخت با خطا مواجه شد");
+  } finally {
+    setPayingTicketId(null);
+  }
+};
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fa-IR', {
@@ -101,22 +142,22 @@ export default function VehicleDetail() {
       minute: '2-digit'
     });
   };
-  
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('fa-IR').format(amount) + " ریال";
   };
-  
+
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case "PAID": return "green";
       case "UNPAID": return "red";
       case "CANCELLED": return "amber";
       default: return "blue";
     }
   };
-  
+
   const getStatusText = (status) => {
-    switch(status) {
+    switch (status) {
       case "PAID": return "پرداخت شده";
       case "UNPAID": return "پرداخت نشده";
       case "CANCELLED": return "لغو شده";
@@ -132,7 +173,7 @@ export default function VehicleDetail() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="p-4 text-center">
@@ -149,7 +190,7 @@ export default function VehicleDetail() {
       </div>
     );
   }
-  
+
   if (!vehicle) {
     return (
       <div className="p-4 text-center">
@@ -172,9 +213,9 @@ export default function VehicleDetail() {
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center mb-6">
-          <IconButton 
-            variant="text" 
-            color="blue" 
+          <IconButton
+            variant="text"
+            color="blue"
             className="rounded-full mr-2"
             onClick={() => navigate(-1)}
           >
@@ -184,13 +225,13 @@ export default function VehicleDetail() {
             اطلاعات خودرو
           </Typography>
         </div>
-        
+
         {/* Vehicle Information Card */}
         <Card className="mb-6 overflow-hidden">
-          <CardHeader 
-            color="blue" 
-            floated={false} 
-            shadow={false} 
+          <CardHeader
+            color="blue"
+            floated={false}
+            shadow={false}
             className="m-0 p-4 rounded-t-xl"
           >
             <div className="flex justify-between items-center">
@@ -223,7 +264,7 @@ export default function VehicleDetail() {
               </Badge>
             </div>
           </CardHeader>
-          
+
           <CardBody className="p-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -234,7 +275,7 @@ export default function VehicleDetail() {
                   {vehicle.model || "ثبت نشده"}
                 </Typography>
               </div>
-              
+
               <div>
                 <Typography variant="small" color="blue-gray" className="font-bold">
                   رنگ
@@ -243,7 +284,7 @@ export default function VehicleDetail() {
                   {vehicle.color || "ثبت نشده"}
                 </Typography>
               </div>
-              
+
               <div>
                 <Typography variant="small" color="blue-gray" className="font-bold">
                   سال ساخت
@@ -252,7 +293,7 @@ export default function VehicleDetail() {
                   {vehicle.year ? vehicle.year : "ثبت نشده"}
                 </Typography>
               </div>
-              
+
               <div>
                 <Typography variant="small" color="blue-gray" className="font-bold">
                   تاریخ ثبت
@@ -263,11 +304,11 @@ export default function VehicleDetail() {
               </div>
             </div>
           </CardBody>
-          
+
           <CardFooter className="pt-0 p-4">
-            <Button 
-              color="red" 
-              variant="gradient" 
+            <Button
+              color="red"
+              variant="gradient"
               fullWidth
               onClick={handleDelete}
               disabled={vehicle.hasUnpaidTickets}
@@ -276,7 +317,7 @@ export default function VehicleDetail() {
               <TrashIcon className="h-5 w-5 ml-2" />
               حذف خودرو
             </Button>
-            
+
             {vehicle.hasUnpaidTickets && (
               <Typography variant="small" color="red" className="mt-2 text-center">
                 به دلیل وجود قبض‌های پرداخت نشده، امکان حذف خودرو وجود ندارد
@@ -284,7 +325,7 @@ export default function VehicleDetail() {
             )}
           </CardFooter>
         </Card>
-        
+
         {/* Owner Information */}
         <Card className="mb-6">
           <CardBody className="p-4">
@@ -294,7 +335,7 @@ export default function VehicleDetail() {
                 مالک خودرو
               </Typography>
             </div>
-            
+
             <div className="flex items-center">
               <Avatar
                 src={`https://api.dicebear.com/7.x/initials/svg?seed=${vehicle.owner.fname} ${vehicle.owner.lname}`}
@@ -313,7 +354,7 @@ export default function VehicleDetail() {
             </div>
           </CardBody>
         </Card>
-        
+
         {/* Tickets Section */}
         <Card>
           <CardBody className="p-4">
@@ -330,7 +371,7 @@ export default function VehicleDetail() {
                 className="mr-2"
               />
             </div>
-            
+
             {vehicle.tickets.length === 0 ? (
               <div className="text-center py-8">
                 <DocumentTextIcon className="h-16 w-16 mx-auto text-gray-400" />
@@ -377,17 +418,28 @@ export default function VehicleDetail() {
                             {formatDate(ticket.issuedAt)}
                           </Typography>
                         </div>
-                        <div className="mr-auto">
+                        <div className="mr-auto flex items-center">
                           <Chip
                             value={getStatusText(ticket.status)}
                             color={getStatusColor(ticket.status)}
                             size="sm"
-                            className="rounded-full"
+                            className="rounded-full mr-2"
                           />
+                          {ticket.status === "UNPAID" && payingTicketId === ticket.id && (
+                            <svg
+                              className="animate-spin h-4 w-4 text-blue-500"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          )}
                         </div>
                       </AccordionHeader>
                     </ListItem>
-                    
+
                     <AccordionBody className="py-1">
                       <div className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex justify-between mb-2">
@@ -398,7 +450,7 @@ export default function VehicleDetail() {
                             {formatCurrency(ticket.amount)}
                           </Typography>
                         </div>
-                        
+
                         <div className="flex justify-between mb-2">
                           <Typography variant="small" className="font-bold">
                             مامور ثبت‌کننده:
@@ -407,7 +459,7 @@ export default function VehicleDetail() {
                             {ticket.officer.fname} {ticket.officer.lname}
                           </Typography>
                         </div>
-                        
+
                         {ticket.payments.length > 0 && (
                           <div className="mt-4">
                             <Typography variant="small" className="font-bold mb-2">
@@ -432,6 +484,35 @@ export default function VehicleDetail() {
                                 </ListItem>
                               ))}
                             </List>
+                          </div>
+                        )}
+
+                        {ticket.status === "UNPAID" && (
+                          <div className="mt-4 flex justify-end">
+                            <Button
+                              size="sm"
+                              color="green"
+                              onClick={() => handlePayment(ticket.id)}
+                              disabled={payingTicketId !== null}
+                              className="flex items-center p-3 ml-auto"
+                            >
+                              {payingTicketId === ticket.id ? (
+                                <>
+                                  <svg
+                                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  در حال پرداخت...
+                                </>
+                              ) : (
+                                "پرداخت این قبض"
+                              )}
+                            </Button>
                           </div>
                         )}
                       </div>
