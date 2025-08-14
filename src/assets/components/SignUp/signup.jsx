@@ -73,20 +73,20 @@ const SignUp = () => {
       !data.codeMeli ||
       !data.phoneNumber
     ) {
-      throw new Error("All fields are required");
+      throw new Error("تمامی فیلد ها اجباری میباشد");
     }
 
     // Validate form data
     if (data.codeMeli.length !== 10 || !/^\d+$/.test(data.codeMeli)) {
-      throw new Error("Code Meli must be 10 digits");
+      throw new Error("کد ملی باید ۱۰ رقمی باشد");
     }
 
     if (data.phoneNumber.length !== 11 || !/^\d+$/.test(data.phoneNumber)) {
-      throw new Error("Phone number must be 11 digits");
+      throw new Error("تلفن همراه باید ۱۱ رقمی باشد");
     }
 
     if (data.password.length < 6) {
-      throw new Error("Password must be at least 6 characters long");
+      throw new Error("گذرواژه شما باید حداقل ۶ رقم باشد");
     }
 
     try {
@@ -100,7 +100,7 @@ const SignUp = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Registeration failed!");
+        setError(errorData.error || "ثبت نام ناموفق .");
       }
 
       const responseData = await response.json();
@@ -120,13 +120,13 @@ const SignUp = () => {
         <Card className="w-96">
           <CardBody className="flex flex-col gap-4">
             <Typography variant="h4" color="blue-gray">
-              Registration Successful!
+              ثبت نام موفقت آمیز بود.
             </Typography>
             <Typography>
-              Your account has been created successfully. You can now log in.
+            حساب کابری شما ایجاد شد و شما میتوانید وارد حساب خود شوید.
             </Typography>
             <Link to={"/login"} onClick={() => setRegistrationSuccess(false)}>
-              <Button className="w-4/5">Go to login page.</Button>
+              <Button className="w-4/5">وارد شوید</Button>
             </Link>
           </CardBody>
         </Card>
