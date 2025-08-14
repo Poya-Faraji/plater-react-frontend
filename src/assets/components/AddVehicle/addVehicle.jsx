@@ -216,7 +216,7 @@ const AddVehicle = () => {
     }
 
     if (data.year.length !== 4 || !/^\d+$/.test(data.year)) {
-      throw new Error("Year must be 4 digits");
+      throw new Error("سال خودرو باید ۴ رقمی باشد");
     }
 
     try {
@@ -256,7 +256,7 @@ const AddVehicle = () => {
     try {
       await createVehicle(formData);
     } catch (err) {
-      setError(err.message || "Creating Vehicle failed. Please try again.");
+      setError(err.message || "ایجاد ماشین ناموفق بود لطفا دوباره تلاش کنید.");
     } finally {
       setIsSubmitting(false);
     }
@@ -380,7 +380,8 @@ const AddVehicle = () => {
                   {selectedImage && (
                     <div className="mt-2 mb-4">
                       <Typography variant="small" className="mb-2">
-                        Selected Image:
+                        تصویر انتخاب شده:
+
                       </Typography>
                       <img
                         src={URL.createObjectURL(selectedImage)}
@@ -399,7 +400,7 @@ const AddVehicle = () => {
                   {scanResult && !isProcessing && (
                     <div className="mt-3 p-3 bg-gray-100 rounded-md w-full">
                       <Typography variant="h6" className="mb-2">
-                        Detected Plate:
+                       پلاک تشخیص داده شده‌:
                       </Typography>
                       <div className="grid grid-cols-4 gap-2 text-center">
                         <div className="bg-white p-2 rounded flex flex-col justify-center items-center">

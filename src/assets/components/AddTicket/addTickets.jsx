@@ -412,7 +412,7 @@ const AddTicket = () => {
                 {selectedImage && (
                   <div className="mt-2 mb-4">
                     <Typography variant="small" className="mb-2">
-                      Selected Image:
+                      تصویر انتخاب شده:
                     </Typography>
                     <img
                       src={URL.createObjectURL(selectedImage)}
@@ -472,7 +472,7 @@ const AddTicket = () => {
                         onSubmit={handleFormSubmission}
                       >
                         <Input
-                          label="Amount"
+                          label="مقدار جریمه به ریال"
                           name="amount"
                           type="number"
                           value={formData.amount}
@@ -482,7 +482,7 @@ const AddTicket = () => {
                         />
 
                         <Textarea
-                          label="Violation"
+                          label="علت و توضیحات جریمه"
                           name="violation"
                           value={formData.violation}
                           onChange={handleTicketChange}
@@ -490,7 +490,7 @@ const AddTicket = () => {
                         />
 
                         <Button className="w-full p-4" type="submit">
-                          Create Ticket
+                          ثبت جریمه
                         </Button>
                       </form>
                     )}
